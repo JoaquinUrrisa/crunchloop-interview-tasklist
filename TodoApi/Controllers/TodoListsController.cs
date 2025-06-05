@@ -20,14 +20,20 @@ namespace TodoApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IList<TodoList>>> GetTodoLists()
         {
-            return Ok(await _context.TodoList.ToListAsync());
+            var lists = await _context.TodoList
+                .Include(l => l.Items)
+                .ToListAsync();
+
+            return Ok(lists);
         }
 
         // GET: api/todolists/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TodoList>> GetTodoList(long id)
         {
-            var todoList = await _context.TodoList.FindAsync(id);
+            var todoList = await _context.TodoList
+                .Include(l => l.Items)
+                .FirstOrDefaultAsync(l => l.Id == id);
 
             if (todoList == null)
             {
